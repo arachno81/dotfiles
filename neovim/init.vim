@@ -7,12 +7,14 @@ set ruler
 set encoding=utf8
 set modifiable
 set write
-set tabstop=4
-set shiftwidth=4
+set tabstop=2
+set shiftwidth=2
 set cursorline
 set guifont=Ricty\ Diminished\ 13
 set guifontwide=Ricty\ Diminished\ 13
 set cursorcolumn
+set title
+
 syntax enable
 
 nnoremap sj <C-w>j
@@ -22,6 +24,8 @@ nnoremap sh <C-w>h
 nnoremap ss :<C-u>sp<CR><C-w>j
 nnoremap sv :<C-u>vs<CR><C-w>l
 
+vnoremap x "_x
+nnoremap x "_x
 
 " PLUGIN SETTINGS
 call plug#begin('~/.config/nvim/plugged')
