@@ -40,6 +40,7 @@ Plug 'sainnhe/gruvbox-material'
 Plug 'dense-analysis/ale'
 Plug 'jiangmiao/auto-pairs'
 Plug 'simeji/winresizer'
+Plug 'friendsofphp/php-cs-fixer'
 call plug#end()
 
 " NERDTree SETTINGS
