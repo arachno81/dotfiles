@@ -96,7 +96,7 @@ let g:gruvbox_material_menu_selection_background='green'
 colorscheme gruvbox-material
 
 "" coc.nvim
-let g:coc_global_extensions = ['coc-tsserver', 'coc-eslint8', 'coc-prettier', 'coc-git', 'coc-fzf-preview', 'coc-lists', 'coc-snippets', 'coc-html', 'coc-css', 'coc-phpls']
+let g:coc_global_extensions = ['coc-eslint8', 'coc-tsserver', 'coc-prettier', 'coc-git', 'coc-fzf-preview', 'coc-lists', 'coc-snippets', 'coc-html', 'coc-css', 'coc-phpls', 'coc-vetur']
 
 inoremap <silent> <expr> <C-Space> coc#refresh()
 nnoremap <silent> K       :<C-u>call <SID>show_documentation()<CR>
