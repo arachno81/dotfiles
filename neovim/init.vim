@@ -1,10 +1,11 @@
+set encoding=utf-8
+set ambiwidth=double
 set clipboard+=unnamed
 set number
 set hlsearch
 set smartindent
 set wildmenu
 set ruler
-set encoding=utf8
 set modifiable
 set write
 set tabstop=2
@@ -15,7 +16,10 @@ set guifontwide=Ricty\ Diminished\ 13
 set cursorcolumn
 set title
 set helplang=ja
+scriptencoding utf-8
 syntax enable
+
+nmap <silent> <C-o><C-o> <ESC>i<C-r>=strftime("-------------------- \n%Y-%m-%d %H:%M:%S(%a)")<CR><CR>
 
 nnoremap sj <C-w>j
 nnoremap sk <C-w>k
