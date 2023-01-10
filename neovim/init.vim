@@ -1,5 +1,5 @@
 set encoding=utf-8
-set ambiwidth=double
+" set ambiwidth=double
 set clipboard+=unnamed
 set number
 set hlsearch
@@ -13,11 +13,21 @@ set shiftwidth=2
 set cursorline
 set guifont=Ricty\ Diminished\ 13
 set guifontwide=Ricty\ Diminished\ 13
-set cursorcolumn
+" set cursorcolumn
 set title
 set helplang=ja
 scriptencoding utf-8
 syntax enable
+let g:indent_guides_enable_on_vim_startup = 1
+" Move current line to up/down
+" Ref: https://vim.fandom.com/wiki/Moving_lines_up_or_down
+nnoremap <A-j> :m .+1<CR>==
+nnoremap <A-k> :m .-2<CR>==
+inoremap <A-j> <Esc>:m .+1<CR>==gi
+inoremap <A-k> <Esc>:m .-2<CR>==gi
+vnoremap <A-j> :m '>+1<CR>gv=gv
+vnoremap <A-k> :m '<-2<CR>gv=gv
+
 
 nmap <silent> <C-o><C-o> <ESC>i<C-r>=strftime("-------------------- \n%Y-%m-%d %H:%M:%S(%a)")<CR><CR>
 
@@ -52,6 +62,7 @@ Plug 'vim-jp/vimdoc-ja'
 Plug 'skanehira/translate.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'skanehira/preview-markdown.vim'
+Plug 'nathanaelkane/vim-indent-guides'
 call plug#end()
 
 " NERDTree SETTINGS
@@ -103,9 +114,8 @@ let g:gruvbox_material_cursor='orange'
 let g:gruvbox_material_foreground='soft'
 let g:gruvbox_material_ui_contrast='high'
 let g:gruvbox_material_menu_selection_background='green'
-
+let g:gruvbox_material_transparent_background=1
 colorscheme gruvbox-material
-
 "" coc.nvim
 let g:coc_global_extensions = ['coc-eslint8', 'coc-tsserver', 'coc-prettier', 'coc-git', 'coc-fzf-preview', 'coc-lists', 'coc-snippets', 'coc-html', 'coc-css', 'coc-phpls', 'coc-vetur']
 
