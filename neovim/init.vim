@@ -1,5 +1,13 @@
+function! s:www(word) abort
+  execute('term w3m google.com/search\?q="' . a:word . '"')
+endfunction
+
+command! -nargs=1 WWW call s:www(<f-args>)
+
+"Markdownのプレビューの縦分割を:PMコマンドで実行
+command! PM PreviewMarkdown
+
 set encoding=utf-8
-" set ambiwidth=double
 set clipboard+=unnamed
 set number
 set hlsearch
@@ -11,11 +19,9 @@ set write
 set tabstop=2
 set shiftwidth=2
 set cursorline
-set guifont=Ricty\ Diminished\ 13
-set guifontwide=Ricty\ Diminished\ 13
-" set cursorcolumn
 set title
 set helplang=ja
+set shell=zsh
 scriptencoding utf-8
 syntax enable
 let g:indent_guides_enable_on_vim_startup = 1
@@ -28,8 +34,10 @@ inoremap <A-k> <Esc>:m .-2<CR>==gi
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gv
 
-
 nmap <silent> <C-o><C-o> <ESC>i<C-r>=strftime("-------------------- \n%Y-%m-%d %H:%M:%S(%a)")<CR><CR>
+
+" インサートモードをターミナルノーマルモードに
+tnoremap <C-c> <C-\><C-n>
 
 nnoremap sj <C-w>j
 nnoremap sk <C-w>k
@@ -40,6 +48,8 @@ nnoremap sv :<C-u>vs<CR><C-w>l
 
 vnoremap x "_x
 nnoremap x "_x
+
+packadd! matchit 
 
 " PLUGIN SETTINGS
 call plug#begin('~/.config/nvim/plugged')
@@ -63,17 +73,59 @@ Plug 'skanehira/translate.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'skanehira/preview-markdown.vim'
 Plug 'nathanaelkane/vim-indent-guides'
+Plug 'johngrib/vim-game-code-break'
+Plug 'tjdevries/train.nvim'
+Plug 'deris/vim-duzzle'
 call plug#end()
 
 " NERDTree SETTINGS
 nmap <C-f> :NERDTreeToggle<CR>
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#buffer_idx_mode = 1
+let g:airline#extensions#tabline#buffer_idx_format = {
+	\ '0': '0 ',
+	\ '1': '1 ',
+	\ '2': '2 ',
+	\ '3': '3 ',
+	\ '4': '4 ',
+	\ '5': '5 ',
+	\ '6': '6 ',
+	\ '7': '7 ',
+	\ '8': '8 ',
+	\ '9': '9 '
+	\}
 nmap <C-p> <Plug>AirlineSelectPrevTab
 nmap <C-n> <Plug>AirlineSelectNextTab
+nmap <leader>1 <Plug>AirlineSelectTab1
+nmap <leader>2 <Plug>AirlineSelectTab2
+nmap <leader>3 <Plug>AirlineSelectTab3
+nmap <leader>4 <Plug>AirlineSelectTab4
+nmap <leader>5 <Plug>AirlineSelectTab5
+nmap <leader>6 <Plug>AirlineSelectTab6
+nmap <leader>7 <Plug>AirlineSelectTab7
+nmap <leader>8 <Plug>AirlineSelectTab8
+nmap <leader>9 <Plug>AirlineSelectTab9
 
+"Translate
+" 翻訳元言語
+let g:translate_source = "en"
+" 翻訳先言語
+let g:translate_target = "ja"
+" 翻訳結果ウィンドウのサイズ
+let g:translate_winsize = 50
 
 " Airline SETTINGS
 let g:airline_powerline_fonts = 1
+let g:airline_mode_map = {
+	\ 'n'  : 'Normal Mode',
+	\ 'i'  : 'Insert Mode',
+	\ 'R'  : 'Replace',
+	\ 'c'  : 'Commandを打ってみても、いいんじゃないかな。',
+	\ 'v'  : '気でも狂ったのかぁー！',
+	\ 'V'  : 'V-Line',
+	\ '⌃V' : 'V-Block',
+	\ }
+let g:airline_theme = 'term'
 
 " Esc SETTINGS
 inoremap jk <Esc>
@@ -94,17 +146,18 @@ inoremap jj <Esc>
 hi VertSplit cterm=none
 
 "" treesitter
-lua <<EOF
-require('nvim-treesitter.configs').setup {
-  ensure_installed = {
-    "typescript",
-    "tsx",
-  },
-  highlight = {
-    enable = true,
-  },
-}
-EOF
+"lua <<EOF
+"require('nvim-treesitter.configs').setup {
+"  ensure_installed = {
+"    "typescript",
+"    "tsx",
+"  },
+"  highlight = {
+"    enable = true,
+"  },
+"}
+"EOF
+"謎エラーが発生したためコメントアウト
 
 "" gruvbox
 if has('termguicolors')
@@ -141,6 +194,9 @@ function! s:show_documentation() abort
   endif
 endfunction
 
+
+
+
 " fzf settings
 let $FZF_DEFAULT_OPTS="--layout=reverse"
 let $FZF_DEFAULT_COMMAND="rg --files --hidden --glob '!.git/**'"
@@ -149,12 +205,21 @@ let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.8, 'height': 0.8,'yoffse
 let mapleader = "\<Space>"
 
 " fzf
-nnoremap <silent> <leader>f :Files<CR>
-nnoremap <silent> <leader>g :GFiles<CR>
-nnoremap <silent> <leader>G :GFiles?<CR>
-nnoremap <silent> <leader>b :Buffers<CR>
-nnoremap <silent> <leader>h :History<CR>
-nnoremap <silent> <leader>r :Rg<CR>
+" キーマッピングが色々と被っているため一旦コメントアウト
+" nnoremap <silent> <leader>f :Files<CR>
+" nnoremap <silent> <leader>g :GFiles<CR>
+" nnoremap <silent> <leader>G :GFiles?<CR>
+" nnoremap <silent> <leader>b :Buffers<CR>
+" nnoremap <silent> <leader>h :History<CR>
+" nnoremap <silent> <leader>r :Rg<CR>
 
 " preview-markdown
 let g:preview_markdown_parser='glow'
+
+"terminal
+if has('nvim')
+  command! -nargs=* Term split | terminal <args>
+  command! -nargs=* Termv vsplit | terminal <args>
+endif
+
+
