@@ -44,6 +44,8 @@ call plug#begin('~/.config/nvim/plugged')
  Plug 'deris/vim-duzzle' "puzzle
  Plug 'magicmonty/sonicpi.nvim'
  Plug 'gen740/SmoothCursor.nvim' "カーソル追尾
+ Plug 'NI57721/vim-shakyo' "写経
+ Plug 'https://github.com/adelarsq/vim-matchit' "対応かっこへの移動
 call plug#end()
 
 let g:indent_guides_enable_on_vim_startup = 1 "インデント可視化の設定
@@ -155,3 +157,8 @@ autocmd BufNewFile,BufRead *.blade.php set filetype=html
 
 " SmoothCursor.nvim
 autocmd VimEnter * lua require('smoothcursor').setup({type = "matrix"})
+
+"vim-shakyo
+nnoremap <leader>r <Plug>(shakyo-run)
+nnoremap <leader>q <Plug>(shakyo-quit)
+nnoremap <leader>c <Plug>(shakyo-clue)
