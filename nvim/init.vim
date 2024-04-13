@@ -17,6 +17,9 @@ scriptencoding utf-8 "VimScriptの中で日本語を使用
 syntax enable "シンタックスハイライトの有効化
 let mapleader = "\<Space>"  "Leaderをスペースキーに割り当て
 
+"一括置換用設定
+cnoreabbrev <expr> s getcmdtype() .. getcmdline() ==# ':s' ? [getchar(), ''][1] .. "%s///g<Left><Left>" : 's'
+
 " Vim Plug
 call plug#begin('~/.config/nvim/plugged')
  Plug 'vim-airline/vim-airline' "ステータスラインのカスタマイズ
@@ -46,6 +49,7 @@ call plug#begin('~/.config/nvim/plugged')
  Plug 'gen740/SmoothCursor.nvim' "カーソル追尾
  Plug 'NI57721/vim-shakyo' "写経
  Plug 'https://github.com/adelarsq/vim-matchit' "対応かっこへの移動
+ Plug 'andymass/vim-matchup'
 call plug#end()
 
 let g:indent_guides_enable_on_vim_startup = 1 "インデント可視化の設定
