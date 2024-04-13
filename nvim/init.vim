@@ -6,7 +6,7 @@ set smartindent "自動でインデントする
 set wildmenu "TABキーでコマンド候補一覧表示
 set ruler "右下にカーソルの位置を表示
 set modifiable "ファイルの編集を許可する
-set write "わからん。でも大事そう
+set write "ファイルを保存する前にバックアップファイルを作成しないようにする
 set tabstop=2 "タブ幅の設定
 set shiftwidth=2 "インデント幅の設定
 set cursorline "カーソルライン表示
@@ -43,7 +43,7 @@ call plug#begin('~/.config/nvim/plugged')
  Plug 'skanehira/preview-markdown.vim' "リアルタイムマークダウンプレビュー(いらないかも)
  Plug 'nathanaelkane/vim-indent-guides' "インデントの可視化
  Plug 'johngrib/vim-game-code-break' "テトリス
- Plug 'tjdevries/train.nvim' "なんだろうこれ
+ Plug 'tjdevries/train.nvim' "移動操作練習
  Plug 'deris/vim-duzzle' "puzzle
  Plug 'magicmonty/sonicpi.nvim'
  Plug 'gen740/SmoothCursor.nvim' "カーソル追尾
