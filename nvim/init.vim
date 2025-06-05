@@ -49,7 +49,7 @@ autocmd BufReadPost,BufNewFile * TSBufEnable indent
 	Plug 'junegunn/fzf.vim'
 	Plug 'skanehira/translate.vim' "Vim内で使用できる翻訳
 	Plug 'easymotion/vim-easymotion' "カーソル移動(スペース2回で行移動等)
-	Plug 'skanehira/preview-markdown.vim' "リアルタイムマークダウンプレビュー
+	"Plug 'skanehira/preview-markdown.vim' "リアルタイムマークダウンプレビュー
 	" Plug 'nathanaelkane/vim-indent-guides' "インデントの可視化
 	Plug 'johngrib/vim-game-code-break' "テトリス
 	Plug 'tjdevries/train.nvim' "移動操作練習
