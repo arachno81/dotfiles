@@ -1,0 +1,28 @@
+{
+  "snippets.ultisnips.pythonPrompt": false,
+  "eslint.filetypes": [
+    "javascript",
+    "typescript",
+    "vue"
+  ],
+  "intelephense": {
+    "diagnostics": {
+      "undefinedClassConstants": false,
+      "undefinedConstants": false,
+      "undefinedFunctions": false,
+      "undefinedMethods": false,
+      "undefinedProperties": false,
+      "undefinedTypes": false
+     },
+    "command": "intelephense",
+    "args": ["--stdio"],
+    "filetypes": ["php"],
+    "initializationOptions": {
+      "storagePath": "/tmp/intelephense"
+     }
+   },
+  "volar.takeOverMode.enabled": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "suggest.noselect": false,
+  "snippets.ultisnips.directories": ["UltiSnips", "my_snippets"]
+}

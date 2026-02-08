@@ -1,0 +1,7 @@
+nvim/plugged/
+nvim/.cache/
+nvim/undo/
+nvim/swap/
+nvim/backup/
+
+.DS_Store
