@@ -1,0 +1,225 @@
+name: Sync label and due to Project fields
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled, edited, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  sync_fields:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync Project Area and Due
+        env:
+          PROJECTS_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          PROJECT_TITLE: ${{ secrets.PROJECT_TITLE }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          python - << 'PY'
+          import os
+          import re
+          import requests
+
+          TOKEN = os.environ["PROJECTS_TOKEN"]
+          PROJECT_TITLE = os.environ["PROJECT_TITLE"]
+          OWNER = os.environ["OWNER"]
+          REPO = os.environ["REPO"]
+          ISSUE_NUMBER = int(os.environ["ISSUE_NUMBER"])
+
+          GQL_URL = "https://api.github.com/graphql"
+          REST_URL = f"https://api.github.com/repos/{OWNER}/{REPO}/issues/{ISSUE_NUMBER}"
+
+          headers = {
+              "Authorization": f"Bearer {TOKEN}",
+              "Accept": "application/vnd.github+json",
+          }
+
+          def gql(query, variables=None):
+              r = requests.post(
+                  GQL_URL,
+                  headers=headers,
+                  json={"query": query, "variables": variables or {}},
+                  timeout=30,
+              )
+              r.raise_for_status()
+              data = r.json()
+              if "errors" in data:
+                  raise RuntimeError(data["errors"])
+              return data["data"]
+
+          # --- 1) Issue取得（labels + body） ---
+          issue = requests.get(REST_URL, headers=headers, timeout=30).json()
+          labels = [l["name"] for l in issue.get("labels", [])]
+          title = issue.get("title") or ""
+          state = issue.get("state") or ""
+          body = issue.get("body") or ""
+
+          # --- 2) due: YYYY-MM-DD を本文から抽出（行頭 due: を想定） ---
+          m = re.search(r'due:\s*(\d{4}-\d{2}-\d{2})', body, re.IGNORECASE)
+          due_date = m.group(1) if m else None
+
+          # --- 3) Issue node id ---
+          q_issue = """
+          query($owner:String!, $repo:String!, $number:Int!) {
+            repository(owner:$owner, name:$repo) {
+              issue(number:$number) { id }
+            }
+          }
+          """
+          issue_node_id = gql(
+              q_issue,
+              {"owner": OWNER, "repo": REPO, "number": ISSUE_NUMBER},
+          )["repository"]["issue"]["id"]
+
+          # --- 4) ユーザーProjectを取得 ---
+          q_projects = """
+          query($login:String!) {
+            user(login:$login) {
+              projectsV2(first: 50) {
+                nodes { id title }
+              }
+            }
+          }
+          """
+          projects = gql(q_projects, {"login": OWNER})["user"]["projectsV2"]["nodes"]
+          project = next((p for p in projects if p["title"] == PROJECT_TITLE), None)
+          if not project:
+              raise RuntimeError("Project not found (check PROJECT_TITLE)")
+
+          project_id = project["id"]
+
+          # --- 5) Project items を取得し、無ければ追加 ---
+          q_items = """
+          query($projectId:ID!) {
+            node(id:$projectId) {
+              ... on ProjectV2 {
+                items(first: 100) {
+                  nodes {
+                    id
+                    content { ... on Issue { id } }
+                  }
+                }
+              }
+            }
+          }
+          """
+          items = gql(q_items, {"projectId": project_id})["node"]["items"]["nodes"]
+          item = next(
+              (i for i in items if i.get("content", {}).get("id") == issue_node_id),
+              None,
+          )
+
+          if not item:
+              m_add = """
+              mutation($projectId:ID!, $contentId:ID!) {
+                addProjectV2ItemById(input:{
+                  projectId:$projectId,
+                  contentId:$contentId
+                }) {
+                  item { id }
+                }
+              }
+              """
+              item_id = gql(
+                  m_add,
+                  {"projectId": project_id, "contentId": issue_node_id},
+              )["addProjectV2ItemById"]["item"]["id"]
+          else:
+              item_id = item["id"]
+
+          # --- 6) フィールド情報（Area: single select / Due: date）を取得 ---
+          q_fields = """
+          query($projectId:ID!) {
+            node(id:$projectId) {
+              ... on ProjectV2 {
+                fields(first: 50) {
+                  nodes {
+                    __typename
+                    ... on ProjectV2SingleSelectField {
+                      id
+                      name
+                      options { id name }
+                    }
+                    ... on ProjectV2Field {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+          """
+          fields = gql(q_fields, {"projectId": project_id})["node"]["fields"]["nodes"]
+
+          # Area field
+          area_field = next((f for f in fields if f.get("name") == "Area" and f.get("options")), None)
+
+          # Due field (Date)
+          due_field = next((f for f in fields if f.get("name") == "Due"), None)
+
+          # --- 7) Area を更新（label名とoption名が一致するものを採用） ---
+          if area_field:
+              option = None
+              for o in area_field["options"]:
+                  if o["name"] in labels:
+                      option = o
+                      break
+
+              if option:
+                  m_set_area = """
+                  mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $optionId:String!) {
+                    updateProjectV2ItemFieldValue(input:{
+                      projectId:$projectId,
+                      itemId:$itemId,
+                      fieldId:$fieldId,
+                      value:{ singleSelectOptionId:$optionId }
+                    }) { projectV2Item { id } }
+                  }
+                  """
+                  gql(m_set_area, {
+                      "projectId": project_id,
+                      "itemId": item_id,
+                      "fieldId": area_field["id"],
+                      "optionId": option["id"],
+                  })
+                  print(f'Area synced: {option["name"]}')
+              else:
+                  print("No matching label for Area. Skip Area.")
+          else:
+              print('Area field not found. Skip Area.')
+
+          # --- 8) Due を更新（due: がある場合のみ） ---
+          if due_date and due_field:
+              m_set_due = """
+              mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $date:Date!) {
+                updateProjectV2ItemFieldValue(input:{
+                  projectId:$projectId,
+                  itemId:$itemId,
+                  fieldId:$fieldId,
+                  value:{ date:$date }
+                }) { projectV2Item { id } }
+              }
+              """
+              gql(m_set_due, {
+                  "projectId": project_id,
+                  "itemId": item_id,
+                  "fieldId": due_field["id"],
+                  "date": due_date,
+              })
+              print(f'Due synced: {due_date}')
+          else:
+              if not due_date:
+                  print("No due: found. Skip Due.")
+              elif not due_field:
+                  print('Due field not found. Skip Due.')
+          # --- 9) タイトルに closed: があれば Issue をクローズする ---
+          if title.lower().startswith("closed:") and state == "open":
+              close_data = {"state": "closed"}
+              requests.patch(REST_URL, headers=headers, json=close_data, timeout=30)
+              print(f"Issue #{ISSUE_NUMBER} has been closed via title prefix.")
+          PY

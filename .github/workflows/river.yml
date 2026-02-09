@@ -1,0 +1,107 @@
+name: Send GitHub events to River
+
+on:
+  push:
+    branches:
+      - main
+
+  issues:
+    types: [opened, closed]
+
+  pull_request:
+    types: [opened, closed]
+
+  issue_comment:
+    types: [created]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to River
+        env:
+          BASE_URL: ${{ secrets.MIRRORS2_BASE_URL }}
+          TOKEN: ${{ secrets.RIVER_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          EVENT_JSON="$(cat "$GITHUB_EVENT_PATH")"
+          EVENT_NAME="${GITHUB_EVENT_NAME}"
+
+          REPO="$(echo "$EVENT_JSON" | jq -r '.repository.full_name')"
+          ACTION="$(echo "$EVENT_JSON" | jq -r '.action // ""')"
+
+          CONTENT=""
+
+          if [ "$EVENT_NAME" = "push" ]; then
+            BRANCH="$(echo "$EVENT_JSON" | jq -r '.ref' | sed 's#refs/heads/##')"
+
+            # messageの改行を維持しつつ、各行を2スペでインデント（jqを簡単にする）
+            COMMITS="$(echo "$EVENT_JSON" | jq -r '
+              if (.commits | length) == 0 then
+                "- (no commits)"
+              else
+                .commits[]
+                | (
+                    "- " + (.id[0:7]) + " by " + (.author.name) + "\n"
+                    + "  " + ((.message // "") | gsub("\r";"") | gsub("\n";"\n  "))
+                  )
+              end
+            ')"
+
+            CONTENT="$(printf "[GitHub] %s (%s)\n\nCommits:\n%s\n\n#github\n" "$REPO" "$BRANCH" "$COMMITS")"
+          fi
+
+          if [ "$EVENT_NAME" = "issues" ]; then
+            NUM="$(echo "$EVENT_JSON" | jq -r '.issue.number')"
+            TITLE="$(echo "$EVENT_JSON" | jq -r '.issue.title // ""')"
+            URL="$(echo "$EVENT_JSON" | jq -r '.issue.html_url // ""')"
+            USER="$(echo "$EVENT_JSON" | jq -r '.issue.user.login // ""')"
+
+            CONTENT="$(printf "[GitHub] %s\n\nIssue #%s %s (%s)\n%s\n\n- by: %s\n\n#github #issue\n" "$REPO" "$NUM" "$TITLE" "$ACTION" "$URL" "$USER")"
+          fi
+
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            NUM="$(echo "$EVENT_JSON" | jq -r '.pull_request.number')"
+            TITLE="$(echo "$EVENT_JSON" | jq -r '.pull_request.title // ""')"
+            URL="$(echo "$EVENT_JSON" | jq -r '.pull_request.html_url // ""')"
+            USER="$(echo "$EVENT_JSON" | jq -r '.pull_request.user.login // ""')"
+            BASE="$(echo "$EVENT_JSON" | jq -r '.pull_request.base.ref // ""')"
+            HEAD="$(echo "$EVENT_JSON" | jq -r '.pull_request.head.ref // ""')"
+
+            CONTENT="$(printf "[GitHub] %s\n\nPR #%s %s (%s)\n%s\n\n- %s <- %s\n- by: %s\n\n#github #pr\n" "$REPO" "$NUM" "$TITLE" "$ACTION" "$URL" "$BASE" "$HEAD" "$USER")"
+          fi
+
+          if [ "$EVENT_NAME" = "issue_comment" ]; then
+            NUM="$(echo "$EVENT_JSON" | jq -r '.issue.number')"
+            URL="$(echo "$EVENT_JSON" | jq -r '.comment.html_url // ""')"
+            USER="$(echo "$EVENT_JSON" | jq -r '.comment.user.login // ""')"
+
+            # コメント本文はjqで取り出して、bashで整形（各行2スペインデント）
+            BODY_RAW="$(echo "$EVENT_JSON" | jq -r '.comment.body // ""')"
+            BODY="$(printf "%s" "$BODY_RAW" | tr -d '\r' | sed 's/^/  /')"
+
+            IS_PR="$(echo "$EVENT_JSON" | jq -r '.issue.pull_request != null')"
+            KIND="Issue"
+            if [ "$IS_PR" = "true" ]; then KIND="PR"; fi
+
+            CONTENT="$(printf "[GitHub] %s\n\n%s #%s comment\n%s\n\n- by: %s\n\nComment:\n%s\n\n#github #comment\n" "$REPO" "$KIND" "$NUM" "$URL" "$USER" "${BODY:-"  (empty)"}")"
+          fi
+
+          if [ -z "$CONTENT" ]; then
+            echo "No CONTENT generated. EVENT_NAME=$EVENT_NAME"
+            exit 0
+          fi
+
+          jq -n --arg content "$CONTENT" '{content:$content}' > payload.json
+
+          # デバッグに便利：本文だけログに出す（TOKENは出さない）
+          echo "---- CONTENT (preview) ----"
+          echo "$CONTENT" | head -n 60
+          echo "---------------------------"
+
+          # curlは失敗時に落ちてほしいので -f を付ける
+          curl -fsS -X POST "${BASE_URL}/api/token-posts" \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data @payload.json
