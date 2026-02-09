@@ -20,7 +20,9 @@ nnoremap <Leader>md :PreviewMarkdown right<CR> "Markdownプレビュー用
 
 filetype plugin indent on " インデントをオン
 
-let $PATH = "/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:" . $PATH
+if $PATH !~# '/opt/homebrew/opt/ruby/bin'
+  let $PATH = '/opt/homebrew/opt/ruby/bin:' . $PATH
+endif
 
 set ambiwidth=double
 
@@ -86,8 +88,6 @@ set ambiwidth=double
 	let g:matchup_matchparen_enabled = 1
 
 	" ---
-
-	let $PATH = "/opt/homebrew/opt/ruby/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:" . $PATH
 
 lua << EOF
 local sp_remote = require('sonicpi.remote')
