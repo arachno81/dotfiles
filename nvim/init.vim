@@ -194,13 +194,13 @@ packadd! matchit
 " Airline SETTINGS
 let g:airline_powerline_fonts = 1
 let g:airline_mode_map = {
-			\ 'n'  : 'Normal Mode',
-			\ 'i'  : 'Insert Mode',
-			\ 'R'  : 'Replace',
-			\ 'c'  : 'Commandを打ってみても、いいんじゃないかな。',
-			\ 'v'  : '気でも狂ったのかぁー！',
-			\ 'V'  : 'V-Line',
-			\ '⌃V' : 'V-Block',
+			\ 'n'  : 'FOCUS',
+			\ 'i'  : 'WRITE',
+			\ 'R'  : 'FIX',
+			\ 'c'  : 'CMD',
+			\ 'v'  : 'MARK',
+			\ 'V'  : 'MARK-L',
+			\ "\<C-v>" : 'MARK-B',
 			\ }
 let g:airline_theme = 'term'
 
