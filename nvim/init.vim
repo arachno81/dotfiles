@@ -55,7 +55,6 @@ set ambiwidth=double
 	Plug 'johngrib/vim-game-code-break' "テトリス
 	Plug 'tjdevries/train.nvim' "移動操作練習
 	Plug 'deris/vim-duzzle' "puzzle
-	Plug 'magicmonty/sonicpi.nvim'
 	Plug 'gen740/SmoothCursor.nvim' "カーソル追尾
 	Plug 'NI57721/vim-shakyo' "写経
 	" Plug 'https://github.com/adelarsq/vim-matchit'
@@ -82,14 +81,9 @@ set ambiwidth=double
 	let g:matchup_matchparen_hi_surround_always = 0
 	let g:matchup_matchparen_timeout = 50
 	let g:matchup_matchparen_insert_timeout = 50
-
 	let g:matchup_enable = 1
-	let g:matchup_matchparen_deferred = 1
 	let g:matchup_delim_start_plaintext = 1
-
 	let g:matchup_matchparen_enabled = 1
-	let g:matchup_matchparen_hi_surround_always = 0
-	let g:matchup_matchparen_deferred = 1
 
 	" ---
 
