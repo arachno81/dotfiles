@@ -16,7 +16,6 @@ set shell=zsh "シェルをzshに指定
 scriptencoding utf-8 "VimScriptの中で日本語を使用
 syntax enable "シンタックスハイライトの有効化
 let mapleader = "\<Space>"  "Leaderをスペースキーに割り当て
-nnoremap <Leader>md :PreviewMarkdown right<CR> "Markdownプレビュー用
 
 filetype plugin indent on " インデントをオン
 
@@ -25,10 +24,6 @@ if $PATH !~# '/opt/homebrew/opt/ruby/bin'
 endif
 
 set ambiwidth=double
-
-" Treesitterのハイライトとインデントを自動で有効にする
-"autocmd BufReadPost,BufNewFile * TSBufEnable highlight
-"autocmd BufReadPost,BufNewFile * TSBufEnable indent
 
 " 一括置換用：:s と打った瞬間に %s///g を出す
 cnoreabbrev <expr> s (getcmdtype() ==# ':' && getcmdline() ==# 's') ? '%s///g<Left><Left>' : 's'
@@ -43,7 +38,6 @@ Plug 'preservim/nerdtree' "ディレクトリのツリー表示
 Plug 'ryanoasis/vim-devicons' "Nerd fontのアイコン表示(先にNerd fontインストールの必要有り)
 Plug 'nvim-treesitter/nvim-treesitter' "シンタックスハイライト(少し複雑)
 Plug 'sainnhe/gruvbox-material' "Vim背景の透過
-" Plug 'dense-analysis/ale' "文法チェック(cocと重複して動いてないかも)
 Plug 'jiangmiao/auto-pairs' "カッコのペアを自動挿入
 Plug 'simeji/winresizer' "Vim画面分割
 Plug 'friendsofphp/php-cs-fixer' "PHPのコード修正
@@ -52,20 +46,16 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'skanehira/translate.vim' "Vim内で使用できる翻訳
 Plug 'easymotion/vim-easymotion' "カーソル移動(スペース2回で行移動等)
-"Plug 'skanehira/preview-markdown.vim' "リアルタイムマークダウンプレビュー
 Plug 'nathanaelkane/vim-indent-guides' "インデントの可視化
 Plug 'johngrib/vim-game-code-break' "テトリス
 Plug 'tjdevries/train.nvim' "移動操作練習
 Plug 'deris/vim-duzzle' "puzzle
-Plug 'gen740/SmoothCursor.nvim' "カーソル追尾
 Plug 'NI57721/vim-shakyo' "写経
 " Plug 'https://github.com/adelarsq/vim-matchit'
 " "対応かっこへの移動/vim-matchupと目的がかぶってるらしいので一旦コメントアウト
 Plug 'andymass/vim-matchup'
 Plug 'honza/vim-snippets' "Vueのために
 Plug 'rainbowhxch/accelerated-jk.nvim' "スクロールのスピードアップ
-"Plug 'kevinhwang91/promise-async' "コードブロック折りたたみ
-"	Plug 'kevinhwang91/nvim-ufo' "コードブロック折りたたみ
 Plug 'vim-jp/vimdoc-ja' "日本語
 Plug 'magicmonty/sonicpi.nvim' " SonicPI
 Plug 'hrsh7th/nvim-cmp' "補完エンジン
@@ -156,15 +146,6 @@ inoremap <A-j> <Esc>:m .+1<CR>==gi
 inoremap <A-k> <Esc>:m .-2<CR>==gi
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gv
-
-" nvim-ufoの基本的なfold設定
-set foldcolumn=0
-set foldlevel=99
-set foldlevelstart=99
-set foldenable
-
-" Luaスクリプトの読み込み
-"	luafile ~/.config/nvim/lua/ufo-setup.lua
 
 " NERDTree SETTINGS
 nmap <C-f> :NERDTreeToggle<CR>
@@ -264,15 +245,6 @@ augroup laravel_blade
 	autocmd!
 	autocmd BufNewFile,BufRead *.blade.php set filetype=blade
 augroup END
-
-"
-" SmoothCursor.nvim
-"autocmd VimEnter * lua require('smoothcursor').setup({type = "matrix"})
-
-"vim-shakyo
-" nnoremap <leader>r <Plug>(shakyo-run)
-" nnoremap <leader>q <Plug>(shakyo-quit)
-" nnoremap <leader>c <Plug>(shakyo-clue)
 
 " nvim-treesitter有効化
 lua << EOF
