@@ -5,8 +5,6 @@ set hlsearch "検索結果をハイライトする
 set smartindent "自動でインデントする
 set wildmenu "TABキーでコマンド候補一覧表示
 set ruler "右下にカーソルの位置を表示
-set modifiable "ファイルの編集を許可する
-set write "ファイルを保存する前にバックアップファイルを作成しないようにする
 set tabstop=2 "タブ幅の設定
 set shiftwidth=2 "インデント幅の設定
 set cursorline "カーソルライン表示
