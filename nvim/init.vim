@@ -5,8 +5,6 @@ set hlsearch "検索結果をハイライトする
 set smartindent "自動でインデントする
 set wildmenu "TABキーでコマンド候補一覧表示
 set ruler "右下にカーソルの位置を表示
-set modifiable "ファイルの編集を許可する
-set write "ファイルを保存する前にバックアップファイルを作成しないようにする
 set tabstop=2 "タブ幅の設定
 set shiftwidth=2 "インデント幅の設定
 set cursorline "カーソルライン表示
@@ -16,98 +14,82 @@ set shell=zsh "シェルをzshに指定
 scriptencoding utf-8 "VimScriptの中で日本語を使用
 syntax enable "シンタックスハイライトの有効化
 let mapleader = "\<Space>"  "Leaderをスペースキーに割り当て
-nnoremap <Leader>md :PreviewMarkdown right<CR> "Markdownプレビュー用
 
 filetype plugin indent on " インデントをオン
 
-let $PATH = "/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:" . $PATH
+if $PATH !~# '/opt/homebrew/opt/ruby/bin'
+	let $PATH = '/opt/homebrew/opt/ruby/bin:' . $PATH
+endif
 
 set ambiwidth=double
 
-" Treesitterのハイライトとインデントを自動で有効にする
-"autocmd BufReadPost,BufNewFile * TSBufEnable highlight
-"autocmd BufReadPost,BufNewFile * TSBufEnable indent
+" 一括置換用：:s と打った瞬間に %s///g を出す
+cnoreabbrev <expr> s (getcmdtype() ==# ':' && getcmdline() ==# 's') ? '%s///g<Left><Left>' : 's'
 
-	" 一括置換用：:s と打った瞬間に %s///g を出す
-	cnoreabbrev <expr> s (getcmdtype() ==# ':' && getcmdline() ==# 's') ? '%s///g<Left><Left>' : 's'
+" Vim Plug
+call plug#begin('~/.config/nvim/plugged')
+Plug 'vim-airline/vim-airline' "ステータスラインのカスタマイズ
+Plug 'vim-airline/vim-airline-themes'
+Plug 'tpope/vim-commentary' "GCCでコメントアウト
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'preservim/nerdtree' "ディレクトリのツリー表示
+Plug 'ryanoasis/vim-devicons' "Nerd fontのアイコン表示(先にNerd fontインストールの必要有り)
+Plug 'nvim-treesitter/nvim-treesitter' "シンタックスハイライト(少し複雑)
+Plug 'sainnhe/gruvbox-material' "Vim背景の透過
+Plug 'jiangmiao/auto-pairs' "カッコのペアを自動挿入
+Plug 'simeji/winresizer' "Vim画面分割
+Plug 'friendsofphp/php-cs-fixer' "PHPのコード修正
+Plug 'mattn/vim-maketable' "テーブルの作成
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'skanehira/translate.vim' "Vim内で使用できる翻訳
+Plug 'easymotion/vim-easymotion' "カーソル移動(スペース2回で行移動等)
+Plug 'nathanaelkane/vim-indent-guides' "インデントの可視化
+Plug 'johngrib/vim-game-code-break' "テトリス
+Plug 'tjdevries/train.nvim' "移動操作練習
+Plug 'deris/vim-duzzle' "puzzle
+Plug 'NI57721/vim-shakyo' "写経
+" Plug 'https://github.com/adelarsq/vim-matchit'
+" "対応かっこへの移動/vim-matchupと目的がかぶってるらしいので一旦コメントアウト
+Plug 'andymass/vim-matchup'
+Plug 'honza/vim-snippets' "Vueのために
+Plug 'rainbowhxch/accelerated-jk.nvim' "スクロールのスピードアップ
+Plug 'vim-jp/vimdoc-ja' "日本語
+Plug 'magicmonty/sonicpi.nvim' " SonicPI
+Plug 'hrsh7th/nvim-cmp' "補完エンジン
+Plug 'kyazdani42/nvim-web-devicons' "アイコン表示
+Plug 'nvim-lua/plenary.nvim' "Lua ジョブ処理(sonicpi.nvim)
+Plug 'nvimdev/dashboard-nvim' 
+call plug#end()
 
-	" Vim Plug
-	call plug#begin('~/.config/nvim/plugged')
-	Plug 'vim-airline/vim-airline' "ステータスラインのカスタマイズ
-	Plug 'vim-airline/vim-airline-themes'
-	Plug 'tpope/vim-commentary' "GCCでコメントアウト
-	Plug 'neoclide/coc.nvim', {'branch': 'release'}
-	Plug 'preservim/nerdtree' "ディレクトリのツリー表示
-	Plug 'ryanoasis/vim-devicons' "Nerd fontのアイコン表示(先にNerd fontインストールの必要有り)
-	Plug 'nvim-treesitter/nvim-treesitter' "シンタックスハイライト(少し複雑)
-	Plug 'sainnhe/gruvbox-material' "Vim背景の透過
-	" Plug 'dense-analysis/ale' "文法チェック(cocと重複して動いてないかも)
-	Plug 'jiangmiao/auto-pairs' "カッコのペアを自動挿入
-	Plug 'simeji/winresizer' "Vim画面分割
-	Plug 'friendsofphp/php-cs-fixer' "PHPのコード修正
-	Plug 'mattn/vim-maketable' "テーブルの作成
-	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-	Plug 'junegunn/fzf.vim'
-	Plug 'skanehira/translate.vim' "Vim内で使用できる翻訳
-	Plug 'easymotion/vim-easymotion' "カーソル移動(スペース2回で行移動等)
-	"Plug 'skanehira/preview-markdown.vim' "リアルタイムマークダウンプレビュー
-	Plug 'nathanaelkane/vim-indent-guides' "インデントの可視化
-	Plug 'johngrib/vim-game-code-break' "テトリス
-	Plug 'tjdevries/train.nvim' "移動操作練習
-	Plug 'deris/vim-duzzle' "puzzle
-	Plug 'magicmonty/sonicpi.nvim'
-	Plug 'gen740/SmoothCursor.nvim' "カーソル追尾
-	Plug 'NI57721/vim-shakyo' "写経
-	" Plug 'https://github.com/adelarsq/vim-matchit'
-	" "対応かっこへの移動/vim-matchupと目的がかぶってるらしいので一旦コメントアウト
-	Plug 'andymass/vim-matchup'
-	Plug 'honza/vim-snippets' "Vueのために
-	Plug 'rainbowhxch/accelerated-jk.nvim' "スクロールのスピードアップ
-	"Plug 'kevinhwang91/promise-async' "コードブロック折りたたみ
-	"	Plug 'kevinhwang91/nvim-ufo' "コードブロック折りたたみ
-	Plug 'vim-jp/vimdoc-ja' "日本語
-	Plug 'magicmonty/sonicpi.nvim' " SonicPI
-	Plug 'hrsh7th/nvim-cmp' "補完エンジン
-	Plug 'kyazdani42/nvim-web-devicons' "アイコン表示
-	Plug 'nvim-lua/plenary.nvim' "Lua ジョブ処理(sonicpi.nvim)
-	Plug 'nvimdev/dashboard-nvim' 
-	call plug#end()
+let g:indent_guides_enable_on_vim_startup = 1 "インデント可視化の設定
 
-	let g:indent_guides_enable_on_vim_startup = 1 "インデント可視化の設定
+" SonicPI導入のためvim-matchupのLuaTreesitter連携をOFFに
 
-	" SonicPI導入のためvim-matchupのLuaTreesitter連携をOFFに
+let g:matchup_matchparen_offscreen = {}
+let g:matchup_matchparen_deferred = 1
+let g:matchup_matchparen_hi_surround_always = 0
+let g:matchup_matchparen_timeout = 50
+let g:matchup_matchparen_insert_timeout = 50
+let g:matchup_enable = 1
+let g:matchup_delim_start_plaintext = 1
+let g:matchup_matchparen_enabled = 1
 
-	let g:matchup_matchparen_offscreen = {}
-	let g:matchup_matchparen_deferred = 1
-	let g:matchup_matchparen_hi_surround_always = 0
-	let g:matchup_matchparen_timeout = 50
-	let g:matchup_matchparen_insert_timeout = 50
-
-	let g:matchup_enable = 1
-	let g:matchup_matchparen_deferred = 1
-	let g:matchup_delim_start_plaintext = 1
-
-	let g:matchup_matchparen_enabled = 1
-	let g:matchup_matchparen_hi_surround_always = 0
-	let g:matchup_matchparen_deferred = 1
-
-	" ---
-
-	let $PATH = "/opt/homebrew/opt/ruby/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:" . $PATH
+" ---
 
 lua << EOF
 local sp_remote = require('sonicpi.remote')
 
 require('dashboard').setup {
-  theme = 'hyper', 
-  config = {
-    header = {
-      '███╗   ██╗███████╗██╗   ██╗███╗   ███╗',
-      '████╗  ██║██╔════╝██║   ██║████╗ ████║',
-      '██╔██╗ ██║█████╗  ██║   ██║██╔████╔██║',
-      '██║╚██╗██║██╔══╝  ██║   ██║██║╚██╔╝██║',
-      '██║ ╚████║███████╗╚██████╔╝██║ ╚═╝ ██║',
-      '╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝     ╚═╝',
+	theme = 'hyper', 
+	config = {
+		header = {
+			'███╗   ██╗███████╗██╗   ██╗███╗   ███╗',
+			'████╗  ██║██╔════╝██║   ██║████╗ ████║',
+			'██╔██╗ ██║█████╗  ██║   ██║██╔████╔██║',
+			'██║╚██╗██║██╔══╝  ██║   ██║██║╚██╔╝██║',
+			'██║ ╚████║███████╗╚██████╔╝██║ ╚═╝ ██║',
+			'╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝     ╚═╝',
 		},
 		shortcut = {
 			{ desc = 'Find File', key = 'f', action = 'Files' },        -- fzf.vim
@@ -163,15 +145,6 @@ inoremap <A-k> <Esc>:m .-2<CR>==gi
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gv
 
-" nvim-ufoの基本的なfold設定
-set foldcolumn=0
-set foldlevel=99
-set foldlevelstart=99
-set foldenable
-
-" Luaスクリプトの読み込み
-"	luafile ~/.config/nvim/lua/ufo-setup.lua
-
 " NERDTree SETTINGS
 nmap <C-f> :NERDTreeToggle<CR>
 let g:airline#extensions#tabline#enabled = 1
@@ -219,13 +192,13 @@ packadd! matchit
 " Airline SETTINGS
 let g:airline_powerline_fonts = 1
 let g:airline_mode_map = {
-			\ 'n'  : 'Normal Mode',
-			\ 'i'  : 'Insert Mode',
-			\ 'R'  : 'Replace',
-			\ 'c'  : 'Commandを打ってみても、いいんじゃないかな。',
-			\ 'v'  : '気でも狂ったのかぁー！',
-			\ 'V'  : 'V-Line',
-			\ '⌃V' : 'V-Block',
+			\ 'n'  : 'FOCUS',
+			\ 'i'  : 'WRITE',
+			\ 'R'  : 'FIX',
+			\ 'c'  : 'CMD',
+			\ 'v'  : 'MARK',
+			\ 'V'  : 'MARK-L',
+			\ "\<C-v>" : 'MARK-B',
 			\ }
 let g:airline_theme = 'term'
 
@@ -267,24 +240,15 @@ let g:coc_global_extensions = ['coc-eslint', 'coc-tsserver', 'coc-prettier', 'co
 
 " Laravel
 augroup laravel_blade
-  autocmd!
-  autocmd BufNewFile,BufRead *.blade.php set filetype=blade
+	autocmd!
+	autocmd BufNewFile,BufRead *.blade.php set filetype=blade
 augroup END
-
-"
-" SmoothCursor.nvim
-"autocmd VimEnter * lua require('smoothcursor').setup({type = "matrix"})
-
-"vim-shakyo
-" nnoremap <leader>r <Plug>(shakyo-run)
-" nnoremap <leader>q <Plug>(shakyo-quit)
-" nnoremap <leader>c <Plug>(shakyo-clue)
 
 " nvim-treesitter有効化
 lua << EOF
 require('nvim-treesitter.configs').setup{
-  highlight = { enable = true },
-  indent    = { enable = true },
+highlight = { enable = true },
+indent    = { enable = true },
 }
 EOF
 
