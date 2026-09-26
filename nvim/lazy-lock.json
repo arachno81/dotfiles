@@ -1,0 +1,13 @@
+{
+  "coc.nvim": { "branch": "release", "commit": "f5910295483bfbe8b58e6f2002e9ae280e5b700e" },
+  "fzf": { "branch": "master", "commit": "b1be3a8be1b833ce5b92fbbac11637643d60a046" },
+  "fzf.vim": { "branch": "master", "commit": "8a0068127ac9ee23d71dab2944ce995726bef462" },
+  "gruvbox-material": { "branch": "master", "commit": "11d779b26a9ab2b3db8c22c6ac9fb6e8ed4fea79" },
+  "lazy.nvim": { "branch": "main", "commit": "85c7ff3711b730b4030d03144f6db6375044ae82" },
+  "lualine.nvim": { "branch": "master", "commit": "221ce6b2d999187044529f49da6554a92f740a96" },
+  "nvim-tree.lua": { "branch": "master", "commit": "478c69c0fe253caea88de9c5e138bfa77395a59a" },
+  "nvim-treesitter": { "branch": "main", "commit": "f603a2f4da48728f80257fb5fbb90145fd1dc173" },
+  "nvim-web-devicons": { "branch": "master", "commit": "58447c1fca354bbf184425e4a8d01deecbd6f3c4" },
+  "vimdoc-ja": { "branch": "master", "commit": "14c414edc2096aed90bc17d8bd51c42a9421ec6b" },
+  "winresizer": { "branch": "master", "commit": "299076f7f79e2e2f7706b2dfacbb3c074ce53257" }
+}
