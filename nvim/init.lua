@@ -22,6 +22,13 @@ opt.ambiwidth = "double"
 
 opt.termguicolors = true
 
+-- Blade filetype detection
+vim.filetype.add({
+  pattern = {
+    [".*%.blade%.php"] = "blade",
+  },
+})
+
 -- Treesitter非対応ファイルなどのフォールバック
 vim.cmd("syntax enable")
 
@@ -161,187 +168,226 @@ require("lazy").setup({
 		build = ":TSUpdate",
   },
 
-  -- ウィンドウサイズ調整
+	-- Markdown rendering
 
-  {
-    "simeji/winresizer",
-  },
+	{
+		"MeanderingProgrammer/render-markdown.nvim",
+		lazy = false,
 
-  -- File tree
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+			"nvim-tree/nvim-web-devicons",
+		},
 
-  {
-    "nvim-tree/nvim-tree.lua",
+		init = function()
+			vim.g.render_markdown_config = {
+				sign = {
+					enabled = false,
+				},
+			}
+		end,
+	},
 
-    dependencies = {
-      "nvim-tree/nvim-web-devicons",
-    },
+	-- Indent / code chunk highlight
 
-    keys = {
-      {
-        "<C-f>",
-        "<cmd>NvimTreeToggle<CR>",
-        desc = "File Tree",
-      },
-      {
-        "<leader>b",
-        "<cmd>NvimTreeToggle<CR>",
-        desc = "File Tree",
-      },
-    },
+	{
+		"shellRaining/hlchunk.nvim",
+		event = { "BufReadPre", "BufNewFile" },
 
-    opts = {
-      view = {
-        width = 32,
-      },
+		config = function()
+			require("hlchunk").setup({
+				indent = {
+					enable = true,
+				},
 
-      renderer = {
-        group_empty = true,
-      },
+				chunk = {
+					enable = true,
+				},
+			})
+		end,
+	},
 
-      filters = {
-        dotfiles = false,
-      },
+	-- ウィンドウサイズ調整
 
-      update_focused_file = {
-        enable = true,
-        update_root = false,
-      },
-    },
-  },
+	{
+		"simeji/winresizer",
+	},
 
-  -- Statusline / Buffer line
+	-- File tree
 
-  {
-    "nvim-lualine/lualine.nvim",
-    lazy = false,
+	{
+		"nvim-tree/nvim-tree.lua",
 
-    dependencies = {
-      "nvim-tree/nvim-web-devicons",
-    },
+		dependencies = {
+			"nvim-tree/nvim-web-devicons",
+		},
 
-    config = function()
-      require("lualine").setup({
-        options = {
-          theme = "auto",
-          globalstatus = true,
-          always_show_tabline = true,
-        },
+		keys = {
+			{
+				"<C-f>",
+				"<cmd>NvimTreeToggle<CR>",
+				desc = "File Tree",
+			},
+			{
+				"<leader>b",
+				"<cmd>NvimTreeToggle<CR>",
+				desc = "File Tree",
+			},
+		},
 
-        sections = {
-          lualine_a = { "mode" },
-          lualine_b = { "branch", "diff", "diagnostics" },
-          lualine_c = { "filename" },
+		opts = {
+			view = {
+				width = 32,
+			},
 
-          lualine_x = {
-            "g:coc_status",
-            "encoding",
-            "fileformat",
-            "filetype",
-          },
+			renderer = {
+				group_empty = true,
+			},
 
-          lualine_y = { "progress" },
-          lualine_z = { "location" },
-        },
+			filters = {
+				dotfiles = false,
+			},
 
-        tabline = {
-          lualine_a = {
-            {
-              "buffers",
-              mode = 2,
-              show_filename_only = true,
-              show_modified_status = true,
+			update_focused_file = {
+				enable = true,
+				update_root = false,
+			},
+		},
+	},
 
-              symbols = {
-                modified = " ●",
-                alternate_file = "",
-                directory = "",
-              },
-            },
-          },
+	-- Statusline / Buffer line
 
-          lualine_b = {},
-          lualine_c = {},
-          lualine_x = {},
-          lualine_y = {},
-          lualine_z = {},
-        },
+	{
+		"nvim-lualine/lualine.nvim",
+		lazy = false,
 
-        extensions = {
-          "nvim-tree",
-          "fzf",
-        },
-      })
+		dependencies = {
+			"nvim-tree/nvim-web-devicons",
+		},
 
-      -- 以前の Airline の Space + 1〜9 を再現
+		config = function()
+			require("lualine").setup({
+				options = {
+					theme = "auto",
+					globalstatus = true,
+					always_show_tabline = true,
+				},
 
-      for i = 1, 9 do
-        local index = i
+				sections = {
+					lualine_a = { "mode" },
+					lualine_b = { "branch", "diff", "diagnostics" },
+					lualine_c = { "filename" },
 
-        map(
-          "n",
-          "<leader>" .. index,
-          "<cmd>LualineBuffersJump " .. index .. "<CR>",
-          { silent = true, desc = "Buffer " .. index }
-        )
-      end
-    end,
-  },
+					lualine_x = {
+						"g:coc_status",
+						"encoding",
+						"fileformat",
+						"filetype",
+					},
 
-  -- FZF
+					lualine_y = { "progress" },
+					lualine_z = { "location" },
+				},
 
-  {
-    "junegunn/fzf",
-  },
+				tabline = {
+					lualine_a = {
+						{
+							"buffers",
+							mode = 2,
+							show_filename_only = true,
+							show_modified_status = true,
 
-  {
-    "junegunn/fzf.vim",
+							symbols = {
+								modified = " ●",
+								alternate_file = "",
+								directory = "",
+							},
+						},
+					},
 
-    dependencies = {
-      "junegunn/fzf",
-    },
+					lualine_b = {},
+					lualine_c = {},
+					lualine_x = {},
+					lualine_y = {},
+					lualine_z = {},
+				},
 
-    cmd = {
-      "Files",
-      "GFiles",
-      "Rg",
-      "Buffers",
-    },
+				extensions = {
+					"nvim-tree",
+					"fzf",
+				},
+			})
 
-    keys = {
-      {
-        "<leader>f",
-        "<cmd>Files<CR>",
-        desc = "Find File",
-      },
+			-- 以前の Airline の Space + 1〜9 を再現
 
-      {
-        "<leader>w",
-        "<cmd>Rg<CR>",
-        desc = "Find Word",
-      },
-    },
-  },
+			for i = 1, 9 do
+				local index = i
 
-  -- Japanese help
+				map(
+					"n",
+					"<leader>" .. index,
+					"<cmd>LualineBuffersJump " .. index .. "<CR>",
+					{ silent = true, desc = "Buffer " .. index }
+				)
+			end
+		end,
+	},
 
-  {
-    "vim-jp/vimdoc-ja",
-    lazy = false,
-  },
+	-- FZF
+
+	{
+		"junegunn/fzf",
+	},
+
+	{
+		"junegunn/fzf.vim",
+
+		dependencies = {
+			"junegunn/fzf",
+		},
+
+		cmd = {
+			"Files",
+			"GFiles",
+			"Rg",
+			"Buffers",
+		},
+
+		keys = {
+			{
+				"<leader>f",
+				"<cmd>Files<CR>",
+				desc = "Find File",
+			},
+
+			{
+				"<leader>w",
+				"<cmd>Rg<CR>",
+				desc = "Find Word",
+			},
+		},
+	},
+
+	-- Japanese help
+
+	{
+		"vim-jp/vimdoc-ja",
+		lazy = false,
+	},
 
 })
 
 -- Treesitter
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "*",
+	pattern = "*",
 
-  callback = function()
-    local ok = pcall(vim.treesitter.start)
+	callback = function()
+		local ok = pcall(vim.treesitter.start)
 
-    if ok then
-      vim.bo.indentexpr =
-        "v:lua.require'nvim-treesitter'.indentexpr()"
-    end
-  end,
+		if ok then
+			vim.bo.indentexpr =
+			"v:lua.require'nvim-treesitter'.indentexpr()"
+		end
+	end,
 })
