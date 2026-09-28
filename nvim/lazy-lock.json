@@ -1,4 +1,5 @@
 {
+  "aerial.nvim": { "branch": "master", "commit": "28fe6e822ae344544c379d60fcb13c9519a1f08a" },
   "coc.nvim": { "branch": "release", "commit": "f5910295483bfbe8b58e6f2002e9ae280e5b700e" },
   "fzf": { "branch": "master", "commit": "b1be3a8be1b833ce5b92fbbac11637643d60a046" },
   "fzf.vim": { "branch": "master", "commit": "a630ef91e1e050574e703f506cd0812b18d26939" },

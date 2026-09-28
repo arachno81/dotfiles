@@ -207,6 +207,31 @@ require("lazy").setup({
 		end,
 	},
 
+	-- ファイル全般のアウトラインを表示
+
+	{
+		"stevearc/aerial.nvim",
+
+		keys = {
+			{
+				"<C-a>",
+				"<cmd>AerialToggle!<CR>",
+				desc = "Toggle Aerial",
+			},
+		},
+
+		opts = {
+			layout = {
+				default_direction = "right",
+			},
+		},
+
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+			"nvim-tree/nvim-web-devicons",
+		},
+	},
+
 	-- ウィンドウサイズ調整
 
 	{
